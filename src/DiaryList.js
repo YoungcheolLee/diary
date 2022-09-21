@@ -1,6 +1,6 @@
 import DiaryItem from "./DiaryItem.js";
 
-const DiaryList = ({ diaryList }) => {
+const DiaryList = ({ onDelete, diaryList }) => {
   return (
     <div className="DiaryList">
       <h2>일기 리스트</h2>
@@ -10,7 +10,7 @@ const DiaryList = ({ diaryList }) => {
           (
             it // 더미데이터의 요소 하나하나가 it 에 담김
           ) => (
-            <DiaryItem key={it.id} {...it} />
+            <DiaryItem key={it.id} {...it} onDelete={onDelete} />
           )
         )}
       </div>
