@@ -6,6 +6,11 @@ const DiaryItem = ({
   emotion,
   id,
 }) => {
+  const onClick = () => {
+    console.log(`${id} 번째 일기입니다.`);
+    alert(`${id} 번째 일기입니다.`);
+  };
+
   return (
     <div className="DiaryItem">
       <div className="info">
@@ -25,6 +30,7 @@ const DiaryItem = ({
       >
         삭제하기
       </button>
+      <button onClick={onClick}> 정보보기 </button>
     </div>
   );
 };
