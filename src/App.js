@@ -9,7 +9,7 @@ function App() {
   const onCreate = (author, content, emotion) => {
     const created_date = new Date().getTime();
     const newItem = {
-      onDelete,
+      onRemove,
       author,
       content,
       emotion,
@@ -19,15 +19,23 @@ function App() {
     dataId.current += 1;
     setData([newItem, ...data]);
   };
-  const onDelete = (targetId) => {
+  const onRemove = (targetId) => {
     const newDiaryList = data.filter((it) => it.id !== targetId);
     setData(newDiaryList);
+  };
+
+  const onEdit = (targetId, newContent) => {
+    setData(
+      data.map((it) =>
+        it.id === targetId ? { ...it, content: newContent } : it
+      )
+    );
   };
 
   return (
     <div className="App.js">
       <DiaryEditor onCreate={onCreate} />
-      <DiaryList onDelete={onDelete} diaryList={data} />
+      <DiaryList onEdit={onEdit} onRemove={onRemove} diaryList={data} />
     </div>
   );
 }
