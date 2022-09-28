@@ -1,13 +1,13 @@
 import { useRef, useState } from "react";
 
 const DiaryItem = ({
-  onEdit,
   onRemove,
+  onEdit,
+  id,
   author,
   content,
-  created_date,
   emotion,
-  id,
+  created_date,
 }) => {
   const [isEdit, setIsEdit] = useState(false); // 수정중인지 아닌지를 판단하는 boolean형 state
   const toggleIsEdit = () => setIsEdit(!isEdit); // toggleIsEdit 함수가 호출 되면 isEdit의 값을 반전시킴
