@@ -1,3 +1,4 @@
+import React from "react";
 import DiaryItem from "./DiaryItem.js";
 
 const DiaryList = ({ onEdit, onRemove, diaryList }) => {

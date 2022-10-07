@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 const DiaryItem = ({
   onRemove,
@@ -9,8 +9,13 @@ const DiaryItem = ({
   emotion,
   created_date,
 }) => {
+  useEffect(() => {
+    console.log(`${id}번 째 아이템 렌더`);
+  });
+
   const [isEdit, setIsEdit] = useState(false); // 수정중인지 아닌지를 판단하는 boolean형 state
   const toggleIsEdit = () => setIsEdit(!isEdit); // toggleIsEdit 함수가 호출 되면 isEdit의 값을 반전시킴
+
   const [localContent, setLocalContent] = useState(content);
   const localContentInput = useRef();
 
@@ -80,4 +85,4 @@ const DiaryItem = ({
   );
 };
 
-export default DiaryItem;
+export default React.memo(DiaryItem);
