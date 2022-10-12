@@ -1,9 +1,9 @@
 import React, {
-  useState,
   useRef,
   useEffect,
   useMemo,
   useCallback,
+  useReducer,
 } from "react";
 import "./App.css";
 import DiaryEditor from "./DiaryEditor";
@@ -13,8 +13,42 @@ import Lifecycle from "./Lifecycle";
 // API 호출용 주소
 // https://jsonplaceholder.typicode.com/comments
 
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "INIT": {
+      return action.data;
+    }
+    case "CREATE": {
+      const created_date = new Date().getTime();
+      const newItem = {
+        ...action.date,
+        created_date,
+      };
+      return [newItem, ...state];
+    }
+    case "REMOVE": {
+      return state.filter((it) => it.id !== action.targetId);
+    }
+    case "EDIT": {
+      return state.map((it) =>
+        it.id === action.targetId ? { ...it, content: action.newContent } : it
+      );
+    }
+    default:
+      return state;
+  }
+};
+
+/*DiaryStateContext를 export만 하는 이유?
+  - export default는 파일 하나당 하나밖에 쓸 수 없기 때문에 비구조화 할당을 통해 내보내줌
+*/
+export const DiaryStateContext = React.createContext();
+
+export const DiaryDispatchContext = React.createContext();
+
 function App() {
-  const [data, setData] = useState([]);
+  const [data, dispatch] = useReducer(reducer, []);
+
   const dataId = useRef(0);
 
   // 컴포넌트가 마운트 되는 시점에 API를 호출하는 메서드
@@ -33,35 +67,33 @@ function App() {
       };
     });
 
-    setData(initData);
+    dispatch({ type: "INIT", data: initData });
   };
 
   useEffect(() => {
     getData();
   }, []);
+
   const onCreate = (author, content, emotion) => {
-    const created_date = new Date().getTime();
-    const newItem = {
-      onRemove,
-      author,
-      content,
-      emotion,
-      created_date,
-      id: dataId.current,
-    };
+    dispatch({
+      type: "CREATE",
+      data: { onRemove, author, content, emotion, id: dataId.current },
+    });
+
     dataId.current += 1;
-    setData([newItem, ...data]);
   };
+
   const onRemove = useCallback((targetId) => {
-    setData((data) => data.filter((it) => it.id !== targetId));
+    dispatch({ type: "REMOVE", targetId });
   }, []);
 
   const onEdit = useCallback((targetId, newContent) => {
-    setData((data) =>
-      data.map((it) =>
-        it.id === targetId ? { ...it, content: newContent } : it
-      )
-    );
+    dispatch({ type: "EDIT", targetId, newContent });
+  }, []);
+
+  //memoizedDispatches를 useMemo로 감싸주는 이유는 App컴포넌트가 재생성이 될 때 재생성 되지 않게 하기 위함 (최적화)
+  const memoizedDispatches = useMemo(() => {
+    return { onCreate, onRemove, onEdit };
   }, []);
 
   /* useMemo 사용 예제
@@ -80,15 +112,19 @@ function App() {
   const { goodCount, badCount, goodRatio } = getDiaryAnalysis;
 
   return (
-    <div className="App.js">
-      <Lifecycle />
-      <DiaryEditor onCreate={onCreate} />
-      <div>전체 일기 : {data.length}</div>
-      <div>기분 좋은 일기 계수 : {goodCount}</div>
-      <div>기분 나쁜 일기 계수 : {badCount}</div>
-      <div>기분 좋은 일기 비율 : {goodRatio}%</div>
-      <DiaryList onEdit={onEdit} onRemove={onRemove} diaryList={data} />
-    </div>
+    <DiaryStateContext.Provider value={data}>
+      <DiaryDispatchContext.Provider value={memoizedDispatches}>
+        <div className="App.js">
+          <Lifecycle />
+          <DiaryEditor />
+          <div>전체 일기 : {data.length}</div>
+          <div>기분 좋은 일기 계수 : {goodCount}</div>
+          <div>기분 나쁜 일기 계수 : {badCount}</div>
+          <div>기분 좋은 일기 비율 : {goodRatio}%</div>
+          <DiaryList />
+        </div>
+      </DiaryDispatchContext.Provider>
+    </DiaryStateContext.Provider>
   );
 }
 

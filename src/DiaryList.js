@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useContext } from "react";
+import { DiaryStateContext } from "./App.js";
 import DiaryItem from "./DiaryItem.js";
 
-const DiaryList = ({ onEdit, onRemove, diaryList }) => {
+const DiaryList = () => {
+  const diaryList = useContext(DiaryStateContext);
   return (
     <div className="DiaryList">
       <h2>일기 리스트</h2>
@@ -11,12 +13,7 @@ const DiaryList = ({ onEdit, onRemove, diaryList }) => {
           (
             it // 더미데이터의 요소 하나하나가 it 에 담김
           ) => (
-            <DiaryItem
-              key={it.id}
-              {...it}
-              onEdit={onEdit}
-              onRemove={onRemove}
-            />
+            <DiaryItem key={it.id} {...it} />
           )
         )}
       </div>

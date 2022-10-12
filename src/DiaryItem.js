@@ -1,17 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
+import { DiaryDispatchContext } from "./App";
 
-const DiaryItem = ({
-  onRemove,
-  onEdit,
-  id,
-  author,
-  content,
-  emotion,
-  created_date,
-}) => {
-  useEffect(() => {
-    console.log(`${id}번 째 아이템 렌더`);
-  });
+const DiaryItem = ({ id, author, content, emotion, created_date }) => {
+  const { onRemove, onEdit } = useContext(DiaryDispatchContext);
 
   const [isEdit, setIsEdit] = useState(false); // 수정중인지 아닌지를 판단하는 boolean형 state
   const toggleIsEdit = () => setIsEdit(!isEdit); // toggleIsEdit 함수가 호출 되면 isEdit의 값을 반전시킴
@@ -36,6 +27,7 @@ const DiaryItem = ({
       localContentInput.current.focus();
       return;
     }
+
     if (window.confirm(`${id}번 째 일기를 수정하시겠습니까?`)) {
       onEdit(id, localContent);
       toggleIsEdit();
